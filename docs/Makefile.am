@@ -1,16 +1,19 @@
-AUTOMAKE_OPTIONS = foreign
+#directory = $(top_srcdir)/docs/man/man3/
 
-EXTRA_DIST = 	autogen.sh TODO README
+#dist_man_MANS = $(directory)/man_page_1.3 $(directory)/man_page_2.3
+#$(directory)/man_page_1.3: doxyfile.stamp
+#$(directory)/man_page_2.3: doxyfile.stamp
 
-ACLOCAL_AMFLAGS = -I m4
+doxyfile.stamp:
+	$(DOXYGEN) doxyfile
+	echo Timestamp > doxyfile.stamp
 
-SUBDIRS = 	src/utils \
-		src/bus \
-		src/core \
-		test \
-		extra \
-		docs 		
+CLEANFILES = doxyfile.stamp 
 
-MAINTAINERCLEANFILES = config.h.in Makefile.in configure stamp-h1 config.log py-compile \
-	ltmain.sh missing install-sh depcomp config.sub config.guess aclocal.m4
- 
+MAINTAINERCLEANFILES = \
+	$(srcdir)/doxyfile.stamp \
+        $(srcdir)/Makefile.in 
+
+all-local: doxyfile.stamp 
+clean-local:
+	rm -rf $(top_srcdir)/docs/mam html latex

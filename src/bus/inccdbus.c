@@ -125,13 +125,13 @@ void ICDS_ExecuteCallback(GHashTable *h, DBusConnection *c,DBusMessage *msg,char
 		char error_str[128];
 
 		snprintf(error_str,128,"Method '%s' not found",key);
-		reply = dbus_message_new_error(msg, INCOP_BUS ".Error", error_str);
+		reply = dbus_message_new_error(msg, INCC_BUS ".Error", error_str);
 
 		dbus_connection_send(c, reply, NULL);
         	dbus_connection_flush(c);
 		dbus_message_unref(reply);
 
-		LOG(INCOPLOG_PRIORITY_INFO,	
+		LOG(INCCLOG_PRIORITY_INFO,	
                 	"Method not found '%s'\n",key);
         }
 	return;
@@ -152,7 +152,7 @@ DBusHandlerResult DB_FilterDbusFunctionMessage(DBusConnection *c, DBusMessage *m
 		real_interface = interface;
 	}	
 #ifdef DEBUG
-	LOG(INCOPLOG_PRIORITY_DEBUG,
+	LOG(INCCLOG_PRIORITY_DEBUG,
 		"i(%s)d(%d)p(%s)m(%s)ri(%s)",interface,destination,path,member,real_interface);
 #endif
 
@@ -170,12 +170,12 @@ DBusHandlerResult DB_FilterDbusFunctionMessage(DBusConnection *c, DBusMessage *m
                 dbus_message_get_args(msg,&err,DBUS_TYPE_STRING,&property_interface,DBUS_TYPE_STRING,&property);
 		iface = (ST_InCCDbusInterface*)g_hash_table_lookup(inccbus.interfaces,property_interface);
 		if (iface == NULL){
-			LOG(INCOPLOG_PRIORITY_INFO,
+			LOG(INCCLOG_PRIORITY_INFO,
                 		"No interface %s available for property %s",property_interface,property);
 			return DBUS_HANDLER_RESULT_HANDLED;
 		}
 		// The properties should only visible on their interface, not globaly
-		LOG(INCOPLOG_PRIORITY_INFO,
+		LOG(INCCLOG_PRIORITY_INFO,
                		"Get property '%s' from interface '%s'",property,property_interface);
                 ICDS_ExecuteCallback(iface->properties,c,msg,property,data);
                 return DBUS_HANDLER_RESULT_HANDLED;
@@ -189,11 +189,11 @@ DBusHandlerResult DB_FilterDbusFunctionMessage(DBusConnection *c, DBusMessage *m
                 dbus_message_get_args(msg,&err,DBUS_TYPE_STRING,&property_interface);
                 iface = (ST_InCCDbusInterface*)g_hash_table_lookup(inccbus.interfaces,property_interface);
                 if (iface == NULL){
-			LOG(INCOPLOG_PRIORITY_INFO,
+			LOG(INCCLOG_PRIORITY_INFO,
                         	"GetAll interface '%s' not available",property_interface);
                         return DBUS_HANDLER_RESULT_HANDLED;
                 }
-		LOG(INCOPLOG_PRIORITY_INFO,
+		LOG(INCCLOG_PRIORITY_INFO,
                        	"GetAll properties from interface '%s'",property_interface);
 		ICDS_ShowAllPropertiesOfInterface(iface,c,msg);
                 return DBUS_HANDLER_RESULT_HANDLED;
@@ -222,13 +222,13 @@ DBusHandlerResult DB_FilterDbusFunctionMessage(DBusConnection *c, DBusMessage *m
 
                 dbus_error_init(&err);
                 dbus_message_get_args(msg,&err,DBUS_TYPE_STRING,&property);
-		LOG(INCOPLOG_PRIORITY_INFO,
+		LOG(INCCLOG_PRIORITY_INFO,
                         "Get property '%s' from interface '%s'",property,real_interface);
                 ICDS_ExecuteCallback(iface->properties,c,msg,property,data);
                 return DBUS_HANDLER_RESULT_HANDLED;
         }
 	
-	LOG(INCOPLOG_PRIORITY_INFO,
+	LOG(INCCLOG_PRIORITY_INFO,
                	"Executing method '%s' from interface '%s'",member,real_interface);
 	ICDS_ExecuteCallback(iface->methods,c,msg,member,data);	
 	return DBUS_HANDLER_RESULT_HANDLED;

@@ -31,7 +31,7 @@
 #define INCCLOG_CATEGORY_NAME INCC_INTERFACE
 #include "log.h"
 
-static ST_InCoPEngine *_inccEngine = NULL;
+static ST_InCCEngine *_inccEngine = NULL;
 
 static int timeout_checker = 180;
 
@@ -43,7 +43,7 @@ void INCC_Init() {
 	ST_Callback *current = NULL;
 	ST_Interface *interface = NULL;
 
-	_inccEngine = (ST_InCoPEngine*)g_new0(ST_InCoPEngine,1);
+	_inccEngine = (ST_InCCEngine*)g_new0(ST_InCCEngine,1);
 
 	POLG_Init();
 	ICDS_Init();
@@ -201,7 +201,7 @@ void INCC_StopAndExit() {
 }
 
 /**
- * INCC_Destroy - Destroy the ST_InCoPEngine type
+ * INCC_Destroy - Destroy the ST_InCCEngine type
  */
 void INCC_Destroy() {
 	ICDS_Destroy();
@@ -224,7 +224,7 @@ void INCC_Destroy() {
 }
 
 /**
- * INCC_Stats - Show statistics related to the ST_InCoPEngine 
+ * INCC_Stats - Show statistics related to the ST_InCCEngine 
  */
 
 void INCC_Stats() {

@@ -31,6 +31,6 @@ if __name__ == '__main__':
         		break
 
 		print "Sending to InCC"
-		iface.ReportIncident(line.rstrip())
+		iface.SendMessage(line.rstrip())
 
 	sys.exit(0)	

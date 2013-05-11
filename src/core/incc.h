@@ -52,7 +52,7 @@ enum {
 
 static const char *incc_states_str [] = { "stop","running"};
 
-#define INCC_ENGINE_NAME "Invisible Covert Channel Engine"
+#define INCC_ENGINE_NAME "InCC engine"
 
 struct ST_InCCEngine {
 	int incc_status;
