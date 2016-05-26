@@ -77,7 +77,7 @@ int PCKT_Send(int sockfd,uint32_t saddr,uint32_t daddr,int ttl,uint16_t sport, u
 	struct sockaddr_in sin;
 
 	sin.sin_family     = AF_INET;
-  	sin.sin_addr.s_addr= daddr;
+  	sin.sin_addr.s_addr= htonl(daddr);
   	sin.sin_port       = dport;
 
   	ip.ihl      = 5;

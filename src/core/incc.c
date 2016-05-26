@@ -62,7 +62,6 @@ void INCC_Init() {
         _inccEngine->send_messages = 0;
         _inccEngine->receive_messages = 0;
         _inccEngine->decrypt_messages = 0;
-	_inccEngine->sockrawfd = PCKT_InitToDevice("lo");
 	//_inccEngine->sockrawfd = PCKT_Init();
 	_inccEngine->show_generated_payloads = FALSE;
 
@@ -160,7 +159,7 @@ void INCC_Start() {
 			}
 			_inccEngine->is_pcap_file = TRUE;
 		}
-
+        _inccEngine->sockrawfd = PCKT_InitToDevice(_inccEngine->source->str);
 		if(pcap_setnonblock(_inccEngine->pcap, 1, errbuf) == 1){
 			fprintf(stderr, "Could not set device \"%s\" to non-blocking: %s\n", _inccEngine->source->str,errbuf);
 			pcap_close(_inccEngine->pcap);
@@ -536,7 +535,8 @@ void INCC_SetSourceIP(char *ipsrc){
 	ret = inet_aton(ipsrc,&addr);
 	if(ret) {
 		_inccEngine->src_address = ntohl(addr.s_addr);
-		_inccEngine->src_mask_address  = ~0 << (32 - atoi(mask));
+        uint32_t mask_bits = atoi(mask);
+		_inccEngine->src_mask_address = mask_bits > 0 && mask_bits <= 32 ? ~0 << (32 - mask_bits) : 0;
 	}
 	return;
 }
@@ -556,7 +556,8 @@ void INCC_SetDestinationIP(char *ipdst){
         ret = inet_aton(ipdst,&addr);
         if(ret) {
                 _inccEngine->dst_address = ntohl(addr.s_addr);
-                _inccEngine->dst_mask_address  = ~0 << (32 - atoi(mask));
+                uint32_t mask_bits = atoi(mask);
+                _inccEngine->dst_mask_address = mask_bits > 0 && mask_bits <= 32 ? ~0 << (32 - mask_bits) : 0;
         }
 	return;
 }
@@ -604,7 +605,6 @@ void INCC_SendMessage(char *message){
 				ipdst = av->sig->ipdst; // use the ip dest of the detected flow
 			}
                 }
-		ipdst = av->sig->ipdst;
 		portsrc = av->sig->portsrc;		
 		portdst = av->sig->portdst;		
 		a.s_addr = ntohl(ipsrc);
