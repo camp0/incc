@@ -208,7 +208,8 @@ void INCC_Destroy() {
     // should be returned to the pools.
     // COMN_ReleaseFlows(_inccEngine->conn);
     COMN_ReleaseFlows(_inccEngine->conn);
-
+    if(_inccEngine->output_file)
+        fclose(_inccEngine->output_file);
     close(_inccEngine->sockrawfd);
     g_string_free(_inccEngine->source,TRUE);
     FLPO_Destroy(_inccEngine->flowpool);
@@ -242,6 +243,9 @@ void INCC_SetExitOnPcap(int value){
     _inccEngine->when_pcap_done_exit = value;
 }
 
+void INCC_SetOutputFileName(char *file_name) {
+    _inccEngine->output_file_name = file_name;
+}
 
 /**
  * INCC_ProcessIncomingFlow - Process the input, forward messages to other process from the network
@@ -288,6 +292,11 @@ void INCC_ProcessIncomingFlow(ST_Signature *sig,ST_GenericFlow *f,unsigned char 
                 _inccEngine->receive_messages++;
                 LOG(INCCLOG_PRIORITY_INFO,
                     "Message received and decrypted flow(0x%x)msg(%s)",f,pkt_recover->payload);
+                if(_inccEngine->output_file_name
+                    && (_inccEngine->output_file ||
+                        (_inccEngine->output_file = fopen(_inccEngine->output_file_name, "a")))) {
+                    fprintf(_inccEngine->output_file, "%s\n", pkt_recover->payload);
+                }
             }           
 
         }

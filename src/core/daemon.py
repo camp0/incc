@@ -52,6 +52,8 @@ def parseOptions():
 		help="Sets the encryption key for the generated IP packets")
 	p.add_option("-x", "--payload", dest="show_payload", action='store_true', 
 		default=False, help="Shows the generated payloads")
+	p.add_option("-o", "--output-file", dest="output_file", default=None, 
+		help="Sets the file to write the received messages to.")
 
 	return p
 
@@ -76,6 +78,9 @@ if __name__ == '__main__':
 
 	if(options.show_payload != None):
 		incc.INCC_ShowGeneratedPayload(options.show_payload)
+
+	if options.output_file is not None:
+		incc.INCC_SetOutputFileName(options.output_file)
 
 	# TODO(luis): the First key interchange could be done by using RSA and with
 	# standar sockets and once the interchage have done close the open
