@@ -58,32 +58,32 @@
 
 static LOG4C_INLINE int POLG_Init(){
 #ifdef HAVE_LIBLOG4C 
-        return(log4c_init());
+    return(log4c_init());
 #else
-        return 0;
+    return 0;
 #endif
 }
 
 static LOG4C_INLINE int POLG_Destroy(){
 #ifdef HAVE_LIBLOG4C 
-        return(log4c_fini());
+  return(log4c_fini());
 #else
-        return 0;
+    return 0;
 #endif
 }
 
 static LOG4C_INLINE void POLG_Msg(char *catName,int a_priority, char *msg){
 #ifdef HAVE_LIBLOG4C 
-        log4c_category_log(log4c_category_get(catName), a_priority, msg);
+    log4c_category_log(log4c_category_get(catName), a_priority, msg);
 #else
-        printf(msg);
+    printf(msg);
 #endif
 }
 
 static LOG4C_INLINE int POLG_SetAppender(char *catName, char *appName){
 #ifdef HAVE_LIBLOG4C 
-         log4c_category_set_appender(log4c_category_get(catName)
-                                  ,log4c_appender_get(appName));
+    log4c_category_set_appender(log4c_category_get(catName)
+        ,log4c_appender_get(appName));
    return(0);
 #else
   return(0);
@@ -93,18 +93,18 @@ static LOG4C_INLINE int POLG_SetAppender(char *catName, char *appName){
 
 static LOG4C_INLINE void POLG_Log(char *catName,int a_priority, char *a_format,...){
 #ifdef HAVE_LIBLOG4C 
-	log4c_category_t* a_category = log4c_category_get(catName);
-	if (log4c_category_is_priority_enabled(a_category, a_priority)) {
-        	va_list va;
-        	va_start(va, a_format);
-        	log4c_category_vlog(a_category, a_priority, a_format, va);
-        	va_end(va);
-	}
-#else
-  	va_list va;
+    log4c_category_t* a_category = log4c_category_get(catName);
+    if (log4c_category_is_priority_enabled(a_category, a_priority)) {
+        va_list va;
         va_start(va, a_format);
-        vprintf(a_format, va);
+        log4c_category_vlog(a_category, a_priority, a_format, va);
         va_end(va);
+    }
+#else
+    va_list va;
+    va_start(va, a_format);
+    vprintf(a_format, va);
+    va_end(va);
 #endif
 }
 

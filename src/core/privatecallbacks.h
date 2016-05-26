@@ -57,130 +57,130 @@ void PRCA_Property_GetTotalFlowsOnFlowPool(DBusConnection *conn,DBusMessage *msg
 
 
 static ST_Callback ST_StaticEngineMethods[] = {
-	{ 
-		.name 	= 	"Start",
-		.in 	=	NULL,
-		.out 	=	"b",
-		.func	= 	PRCA_Method_StartEngine 
-	},
-	{ 
-		.name 	= 	"Stop",
-		.in	=	NULL,
-		.out	=	"b",
-		.func	=	PRCA_Method_StopEngine 
-	},
-	{	
-		.name	= 	"SetSource",
-		.in	=	"s",
-		.out	=	"b",
-		.func	=	PRCA_Method_SetSource
-	},
-        {
-                .name   =       "ShowAvailable",
-                .in     =       NULL,
-                .out    =       "a(si)",
-                .func   =      	PRCA_Method_ShowDetectedSignatures 
-        },
-        {
-                .name   =       "SendMessage",
-                .in     =       "s",
-                .out    =       "b",
-                .func   =       PRCA_Method_SendMessage
-        },
-	{} 
+    { 
+        .name   =   "Start",
+        .in     =   NULL,
+        .out    =   "b",
+        .func   =   PRCA_Method_StartEngine 
+    },
+    { 
+        .name   =   "Stop",
+        .in =   NULL,
+        .out    =   "b",
+        .func   =   PRCA_Method_StopEngine 
+    },
+    {   
+        .name   =   "SetSource",
+        .in     =   "s",
+        .out    =   "b",
+        .func   =   PRCA_Method_SetSource
+    },
+    {
+        .name   =   "ShowAvailable",
+        .in     =   NULL,
+        .out    =   "a(si)",
+        .func   =   PRCA_Method_ShowDetectedSignatures 
+    },
+    {
+        .name   =   "SendMessage",
+        .in     =   "s",
+        .out    =   "b",
+        .func   =   PRCA_Method_SendMessage
+    },
+    {} 
 };
 
 static ST_Callback ST_StaticPropertiesCallbacks [] = {
         { 
-		.name	=	"State",
-		.in	=       NULL,
-		.out	=	"s",       
-		.func	=	PRCA_Property_GetState 
-	},
+        .name   =   "State",
+        .in =       NULL,
+        .out    =   "s",       
+        .func   =   PRCA_Property_GetState 
+    },
         { 
-		.name	=	"Source",
-		.in	=       "s",
-		.out	=	"s",
-		.func	=        PRCA_Property_GetSource 
-	},
-        {
-                .name   =       "InsertConnections",
-                .in     =       NULL,
-                .out    =       "i",
-                .func   =       PRCA_Property_GetTotalInsertConnections
-        },
-	{
-		.name	=	"CurrentConnections",
-		.in	=	NULL,
-		.out	=	"i",
-		.func	=	PRCA_Property_GetTotalCurrentConnections
-	},
-	{
-		.name	=	"ReleaseConnections",
-		.in	=	NULL,
-		.out	=	"i",
-		.func	=	PRCA_Property_GetTotalReleaseConnections
-	},
-	{
-		.name	=	"TimeExpireConnections",
-		.in	=	NULL,
-		.out	=	"i",
-		.func	=	PRCA_Property_GetTotalTimeoutConnections
-	},
+        .name   =   "Source",
+        .in =       "s",
+        .out    =   "s",
+        .func   =        PRCA_Property_GetSource 
+    },
+    {
+        .name   =   "InsertConnections",
+        .in     =   NULL,
+        .out    =   "i",
+        .func   =   PRCA_Property_GetTotalInsertConnections
+    },
+    {
+        .name   =   "CurrentConnections",
+        .in =   NULL,
+        .out    =   "i",
+        .func   =   PRCA_Property_GetTotalCurrentConnections
+    },
+    {
+        .name   =   "ReleaseConnections",
+        .in =   NULL,
+        .out    =   "i",
+        .func   =   PRCA_Property_GetTotalReleaseConnections
+    },
+    {
+        .name   =   "TimeExpireConnections",
+        .in =   NULL,
+        .out    =   "i",
+        .func   =   PRCA_Property_GetTotalTimeoutConnections
+    },
         { 
-		.name	=	"FlowsOnPool",
-		.in	=	NULL,
-		.out	=	"i",
-		.func	=       PRCA_Property_GetTotalFlowsOnFlowPool 
-	},
+        .name   =   "FlowsOnPool",
+        .in =   NULL,
+        .out    =   "i",
+        .func   =       PRCA_Property_GetTotalFlowsOnFlowPool 
+    },
         { 
-		.name	=	"FlowReleases",
-		.in	=	NULL,
-		.out	=	"i",
-		.func	=       PRCA_Property_GetFlowPoolTotalReleases 
-	},
+        .name   =   "FlowReleases",
+        .in =   NULL,
+        .out    =   "i",
+        .func   =       PRCA_Property_GetFlowPoolTotalReleases 
+    },
         { 
-		.name	=	"FlowAcquires",
-		.in	=       NULL,
-		.out	=	"i",
-		.func	=       PRCA_Property_GetFlowPoolTotalAcquires 
-	},
-	{ 
-		.name	=	"FlowErrors",
-		.in	=	NULL,
-		.out	=	"i",
-		.func	=       PRCA_Property_GetFlowPoolTotalErrors 
-	},
-	{}
+        .name   =   "FlowAcquires",
+        .in =       NULL,
+        .out    =   "i",
+        .func   =       PRCA_Property_GetFlowPoolTotalAcquires 
+    },
+    { 
+        .name   =   "FlowErrors",
+        .in =   NULL,
+        .out    =   "i",
+        .func   =       PRCA_Property_GetFlowPoolTotalErrors 
+    },
+    {}
 };
 
 void PRCA_Method_IncreaseFlowPool(DBusConnection *conn,DBusMessage *msg, void *data);
 void PRCA_Method_DecreaseFlowPool(DBusConnection *conn,DBusMessage *msg, void *data);
 
 static ST_Callback ST_StaticConnectionMethodCallbacks [] = {
-	{ 
-		.name	=	"IncreaseFlowPool",
-		.in	=	"i",
-		.out	=	"b",
-		.func	=	PRCA_Method_IncreaseFlowPool 
-	},
-	{ 
-		.name	=	"DecreaseFlowPool",
-		.in	=	"i",
-		.out	=	"b",
-		.func	=	PRCA_Method_DecreaseFlowPool 
-	},
-	{}
+    { 
+        .name   =   "IncreaseFlowPool",
+        .in     =   "i",
+        .out    =   "b",
+        .func   =   PRCA_Method_IncreaseFlowPool 
+    },
+    { 
+        .name   =   "DecreaseFlowPool",
+        .in     =   "i",
+        .out    =   "b",
+        .func   =   PRCA_Method_DecreaseFlowPool 
+    },
+    {}
 };
 
 static ST_Interface ST_PublicInterfaces [] = {
-        { 
-		.name		=	INCC_INTERFACE,
-		.methods 	= 	ST_StaticEngineMethods,
-		.signals 	= 	NULL,
-		.properties 	= 	ST_StaticPropertiesCallbacks	
-	},
-	{}
+    { 
+        .name           =   INCC_INTERFACE,
+        .methods        =   ST_StaticEngineMethods,
+        .signals        =   NULL,
+        .properties     =   ST_StaticPropertiesCallbacks    
+    },
+    {}
 };
 
 

@@ -28,56 +28,56 @@
 #include <sys/types.h>
 
 struct ST_GenericFlow {
-	u_int32_t saddr;
-	u_int32_t daddr;
-	u_int16_t sport;
-	u_int16_t dport;
-	u_int16_t protocol;
+    u_int32_t saddr;
+    u_int32_t daddr;
+    u_int16_t sport;
+    u_int16_t dport;
+    u_int16_t protocol;
 
-	short detected;
+    short detected;
 
-	int32_t total_bytes;
-        int32_t total_packets;
+    int32_t total_bytes;
+    int32_t total_packets;
 
-	struct timeval arrive_time;
-	struct timeval current_time;
-	void (*release)(struct ST_GenericFlow *f,void *data);
+    struct timeval arrive_time;
+    struct timeval current_time;
+    void (*release)(struct ST_GenericFlow *f,void *data);
 } __attribute__((packed));
 
 typedef struct ST_GenericFlow ST_GenericFlow;
 
 static void GEFW_SetFlowId(ST_GenericFlow *f,u_int32_t saddr,u_int16_t sport,u_int16_t protocol,u_int32_t daddr,u_int16_t dport){
-	f->saddr = saddr;
-	f->sport = sport;
-	f->daddr = daddr;
-	f->dport = dport;
-	f->protocol = protocol;
-	f->detected = 0;
-	f->release = NULL;
-	return;
+    f->saddr = saddr;
+    f->sport = sport;
+    f->daddr = daddr;
+    f->dport = dport;
+    f->protocol = protocol;
+    f->detected = 0;
+    f->release = NULL;
+    return;
 }
 static void GEFW_Reset(ST_GenericFlow *f) { 
-	f->total_bytes = 0;f->total_packets= 0;
-	f->arrive_time.tv_sec = 0;f->arrive_time.tv_usec = 0;
-	f->current_time.tv_sec = 0;f->current_time.tv_usec = 0;
-	f->detected = 0;
-	f->release = NULL;
-	return;
+    f->total_bytes = 0;f->total_packets= 0;
+    f->arrive_time.tv_sec = 0;f->arrive_time.tv_usec = 0;
+    f->current_time.tv_sec = 0;f->current_time.tv_usec = 0;
+    f->detected = 0;
+    f->release = NULL;
+    return;
 };
 
 static void GEFW_SetArriveTime(ST_GenericFlow *f,struct timeval *t) { 
-	f->arrive_time.tv_sec = t->tv_sec;f->arrive_time.tv_usec = t->tv_usec;
-	f->current_time.tv_sec = t->tv_sec;f->current_time.tv_usec = t->tv_usec; 
+    f->arrive_time.tv_sec = t->tv_sec;f->arrive_time.tv_usec = t->tv_usec;
+    f->current_time.tv_sec = t->tv_sec;f->current_time.tv_usec = t->tv_usec; 
 };
 
 static void GEFW_UpdateTime(ST_GenericFlow *f,struct timeval *t) {
-	f->current_time.tv_sec = t->tv_sec;f->current_time.tv_usec = t->tv_usec; 
+    f->current_time.tv_sec = t->tv_sec;f->current_time.tv_usec = t->tv_usec; 
 }
 
 static void GEFW_Destroy(ST_GenericFlow *f){
-	if(f){
-		g_free(f);
-		f = NULL;
-	}
+    if(f){
+        g_free(f);
+        f = NULL;
+    }
 }
 #endif

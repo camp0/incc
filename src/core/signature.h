@@ -38,22 +38,22 @@
 #define MAX_EXPRESSION 32
 
 struct ST_Signature {
-	int identifier;
-	char name[MAX_EXPRESSION_NAME];
-	unsigned char expression[MAX_EXPRESSION];
-	unsigned char head[MAX_EXPRESSION];
-	unsigned char tail[MAX_EXPRESSION];
-	int headsize;
-	int tailsize;
-        pcre *regex;
-        pcre_extra *extra_regex;
-	int32_t matchs;
-	
-	// last flow that matchs the signature
-	u_int32_t ipsrc;
-	u_int32_t ipdst;
-	u_int16_t portsrc;
-	u_int16_t portdst;
+    int identifier;
+    char name[MAX_EXPRESSION_NAME];
+    unsigned char expression[MAX_EXPRESSION];
+    unsigned char head[MAX_EXPRESSION];
+    unsigned char tail[MAX_EXPRESSION];
+    int headsize;
+    int tailsize;
+    pcre *regex;
+    pcre_extra *extra_regex;
+    int32_t matchs;
+    
+    // last flow that matchs the signature
+    u_int32_t ipsrc;
+    u_int32_t ipdst;
+    u_int16_t portsrc;
+    u_int16_t portdst;
 } __attribute__((packed));
 
 typedef struct ST_Signature ST_Signature;
@@ -61,7 +61,7 @@ typedef struct ST_Signature ST_Signature;
 ST_Signature *SGNT_Init(void); 
 void SGNT_Destroy(ST_Signature *sig);
 void SGNT_SetValues(ST_Signature *sig,int identifier,char *name,char *expression,
-	unsigned char *head,int headsize, unsigned char *tail,int tailsize);
+    unsigned char *head,int headsize, unsigned char *tail,int tailsize);
 int SGNT_Matchs(ST_Signature *s,unsigned char *payload,int len);
 
 #endif

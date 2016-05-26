@@ -15,7 +15,7 @@ source_files = source_files + ['../src/core/payload.c','../src/core/protocol.c']
 incc_test_module = Extension('_incc_test',
 	sources = source_files,
 	include_dirs = temp_includes,
-	libraries = ['glib-2.0','pcap','dbus-1','log4c','ssl'],
+	libraries = ['glib-2.0','pcap','dbus-1','log4c','ssl','crypto'],
 	define_macros=[('HAVE_LIBDBUS_1','1'),('HAVE_CONFIG','1')],
 	)
 

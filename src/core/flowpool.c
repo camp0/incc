@@ -33,16 +33,16 @@
  */
 
 ST_FlowPool *FLPO_Init() {
-	ST_FlowPool *pool = NULL;
+    ST_FlowPool *pool = NULL;
 
-	pool = (ST_FlowPool*)g_new(ST_FlowPool,1);
-	pool->flows = NULL;	
-        pool->total_releases = 0;
-        pool->total_acquires = 0;
-        pool->total_errors = 0;
+    pool = (ST_FlowPool*)g_new(ST_FlowPool,1);
+    pool->flows = NULL; 
+    pool->total_releases = 0;
+    pool->total_acquires = 0;
+    pool->total_errors = 0;
 
-	FLPO_IncrementFlowPool(pool,MAX_FLOWS_PER_POOL);
-	return pool;
+    FLPO_IncrementFlowPool(pool,MAX_FLOWS_PER_POOL);
+    return pool;
 }
 
 /**
@@ -51,24 +51,24 @@ ST_FlowPool *FLPO_Init() {
  */
 
 void FLPO_Stats(ST_FlowPool *p){
-	int32_t value = MAX_FLOWS_PER_POOL * sizeof(ST_GenericFlow);
-        char *unit = "Bytes";
+    int32_t value = MAX_FLOWS_PER_POOL * sizeof(ST_GenericFlow);
+    char *unit = "Bytes";
 
-        if((value / 1024)>0){
-                unit = "KBytes";
-                value = value / 1024;
-        }
-        if((value / 1024)>0){
-                unit = "MBytes";
-                value = value / 1024;
-        }
+    if((value / 1024)>0){
+        unit = "KBytes";
+        value = value / 1024;
+    }
+    if((value / 1024)>0){
+        unit = "MBytes";
+        value = value / 1024;
+    }
 
-	fprintf(stdout,"FlowPool statistics\n");
-	fprintf(stdout,"\tflow size:%d bytes\n",sizeof(ST_GenericFlow));
-	fprintf(stdout,"\tallocated memory:%d %s\n",value,unit);
-	fprintf(stdout,"\tflows:%d\n\treleases:%d\n",g_slist_length(p->flows),p->total_releases);
-	fprintf(stdout,"\tacquires:%d\n\terrors:%d\n",p->total_acquires,p->total_errors);
-	return;
+    fprintf(stdout,"FlowPool statistics\n");
+    fprintf(stdout,"\tflow size:%d bytes\n",sizeof(ST_GenericFlow));
+    fprintf(stdout,"\tallocated memory:%d %s\n",value,unit);
+    fprintf(stdout,"\tflows:%d\n\treleases:%d\n",g_slist_length(p->flows),p->total_releases);
+    fprintf(stdout,"\tacquires:%d\n\terrors:%d\n",p->total_acquires,p->total_errors);
+    return;
 }
 
 /**
@@ -77,14 +77,14 @@ void FLPO_Stats(ST_FlowPool *p){
  * @param p the ST_FlowPool to free
  */
 void FLPO_Destroy(ST_FlowPool *p){
-	FLPO_DecrementFlowPool(p,g_slist_length(p->flows));
-	g_slist_free(p->flows);
-	g_free(p);
-	p = NULL;
+    FLPO_DecrementFlowPool(p,g_slist_length(p->flows));
+    g_slist_free(p->flows);
+    g_free(p);
+    p = NULL;
 }
 
 int FLPO_GetNumberFlows(ST_FlowPool *p){
-	return g_slist_length(p->flows);
+    return g_slist_length(p->flows);
 }
 
 /**
@@ -95,19 +95,19 @@ int FLPO_GetNumberFlows(ST_FlowPool *p){
  */
 
 int FLPO_IncrementFlowPool(ST_FlowPool *p,int value){
-	int i;
+    int i;
 
-        if (value < 1)
-                return FALSE;
-	LOG(INCCLOG_PRIORITY_INFO,
-		"Allocating %d flows on pool, current flows on pool %d",value,g_slist_length(p->flows));
+    if (value < 1)
+        return FALSE;
+    LOG(INCCLOG_PRIORITY_INFO,
+        "Allocating %d flows on pool, current flows on pool %d",value,g_slist_length(p->flows));
 
-        for (i = 0;i<value;i++){
-		ST_GenericFlow *f = g_new0(ST_GenericFlow,1);
-		GEFW_Reset(f);	
-                p->flows = g_slist_prepend(p->flows,f);
-	}
-        return TRUE;
+    for (i = 0;i<value;i++){
+        ST_GenericFlow *f = g_new0(ST_GenericFlow,1);
+        GEFW_Reset(f);  
+        p->flows = g_slist_prepend(p->flows,f);
+    }
+    return TRUE;
 }
 
 /**
@@ -118,25 +118,25 @@ int FLPO_IncrementFlowPool(ST_FlowPool *p,int value){
  */
 
 int FLPO_DecrementFlowPool(ST_FlowPool *p,int value) {
-	ST_GenericFlow *f;
-	int i,r;
+    ST_GenericFlow *f;
+    int i,r;
 
-        if (value > g_slist_length(p->flows))
-                r = g_slist_length(p->flows);
-        else
-                r = value;
+    if (value > g_slist_length(p->flows))
+        r = g_slist_length(p->flows);
+    else
+        r = value;
 
-	LOG(INCCLOG_PRIORITY_INFO,
-		"Freeing %d flows on pool",r);
-        for (i = 0;i<r;i++){
-                GSList *item = g_slist_nth(p->flows,0);
-                if (item != NULL) {
-                        p->flows = g_slist_remove_link(p->flows,item);
-                        f = (ST_GenericFlow*)item->data;
-			GEFW_Destroy(f);
-                }
+    LOG(INCCLOG_PRIORITY_INFO,
+        "Freeing %d flows on pool",r);
+    for (i = 0;i<r;i++){
+        GSList *item = g_slist_nth(p->flows,0);
+        if (item != NULL) {
+            p->flows = g_slist_remove_link(p->flows,item);
+            f = (ST_GenericFlow*)item->data;
+            GEFW_Destroy(f);
         }
-	return TRUE;
+    }
+    return TRUE;
 }
 
 /**
@@ -147,11 +147,11 @@ int FLPO_DecrementFlowPool(ST_FlowPool *p,int value) {
  */
 
 void FLPO_AddFlow(ST_FlowPool *p,ST_GenericFlow *flow){
-	if(flow != NULL){ 
-        	GEFW_Reset(flow);
-        	p->total_releases++;
-        	p->flows = g_slist_prepend(p->flows,flow);
-	}
+    if(flow != NULL){ 
+        GEFW_Reset(flow);
+        p->total_releases++;
+        p->flows = g_slist_prepend(p->flows,flow);
+    }
 }
 
 /**
@@ -163,16 +163,16 @@ void FLPO_AddFlow(ST_FlowPool *p,ST_GenericFlow *flow){
  */
 
 ST_GenericFlow *FLPO_GetFlow(ST_FlowPool *p){
-        GSList *item = NULL;
+    GSList *item = NULL;
 
-        item = g_slist_nth(p->flows,0);
-        if (item!= NULL) {
-                p->flows = g_slist_remove_link(p->flows,item);
-                p->total_acquires++;
-                return (ST_GenericFlow*)item->data;
-        }
-        p->total_errors++;
-        return NULL;
+    item = g_slist_nth(p->flows,0);
+    if (item!= NULL) {
+        p->flows = g_slist_remove_link(p->flows,item);
+        p->total_acquires++;
+        return (ST_GenericFlow*)item->data;
+    }
+    p->total_errors++;
+    return NULL;
 }
 
 

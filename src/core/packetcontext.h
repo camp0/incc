@@ -43,18 +43,18 @@
 #define ETH_P_IP 0x0800
 
 struct ST_PacketContext {
-	struct iphdr *ip;
-	struct tcphdr *tcp;
-	struct udphdr *udp;
-	unsigned char *payload;
-	int len;
-	struct timeval *now;
+    struct iphdr *ip;
+    struct tcphdr *tcp;
+    struct udphdr *udp;
+    unsigned char *payload;
+    int len;
+    struct timeval *now;
 };
 
 typedef struct ST_PacketContext ST_PacketContext;
 
 ST_PacketContext _pktctx;
-	
+    
 static void PKCX_Init(void) { _pktctx.ip= NULL;_pktctx.tcp = NULL;_pktctx.udp = NULL;_pktctx.payload = NULL;_pktctx.len=0;};
 static void PKCX_Destroy(void) { return;};
 static void PKCX_SetTCPHeader(unsigned char *packet) { _pktctx.tcp = (struct tcphdr*)packet; };
@@ -88,19 +88,19 @@ static int PKCX_IsTCPPush(void) { return _pktctx.tcp->psh;}
 static unsigned char *PKCX_GetPayload(void) { return _pktctx.payload;}
 
 static char* PKCX_GetSrcAddrDotNotation(void) { 
-	struct in_addr a; 
-        static char ip[INET_ADDRSTRLEN];
-	a.s_addr=_pktctx.ip->saddr; 
-        inet_ntop(AF_INET, &a, ip, INET_ADDRSTRLEN);
-        return (char*)&ip;
+    struct in_addr a; 
+    static char ip[INET_ADDRSTRLEN];
+    a.s_addr=_pktctx.ip->saddr; 
+    inet_ntop(AF_INET, &a, ip, INET_ADDRSTRLEN);
+    return (char*)&ip;
 }
 
 static char* PKCX_GetDstAddrDotNotation(void) { 
-	struct in_addr a;
-        static char ip[INET_ADDRSTRLEN];
-        a.s_addr=_pktctx.ip->daddr;
-        inet_ntop(AF_INET, &a, ip, INET_ADDRSTRLEN);
-        return (char*)&ip;
+    struct in_addr a;
+    static char ip[INET_ADDRSTRLEN];
+    a.s_addr=_pktctx.ip->daddr;
+    inet_ntop(AF_INET, &a, ip, INET_ADDRSTRLEN);
+    return (char*)&ip;
 }
 static u_int32_t PKCX_GetTCPSequenceNumber(void) { return ntohl(_pktctx.tcp->seq); }
 
@@ -112,27 +112,27 @@ static unsigned int PKCX_GetUDPHeaderLength(void) { return sizeof(struct udphdr)
 
 /* Generic fields */
 static u_int16_t PKCX_GetDstPort(void) { 
-	if(_pktctx.ip->protocol == IPPROTO_TCP)
-		return ntohs(_pktctx.tcp->dest);
-	else
-		if(_pktctx.ip->protocol == IPPROTO_UDP)
-			return ntohs(_pktctx.udp->dest);	
-	return 0;
+    if(_pktctx.ip->protocol == IPPROTO_TCP)
+        return ntohs(_pktctx.tcp->dest);
+    else
+        if(_pktctx.ip->protocol == IPPROTO_UDP)
+            return ntohs(_pktctx.udp->dest);    
+    return 0;
 }
 
 static u_int16_t PKCX_GetSrcPort(void) {
-        if(_pktctx.ip->protocol == IPPROTO_TCP)
-                return ntohs(_pktctx.tcp->source);
-        else
-                if(_pktctx.ip->protocol == IPPROTO_UDP)
-                        return ntohs(_pktctx.udp->source);
-        return 0;
+    if(_pktctx.ip->protocol == IPPROTO_TCP)
+        return ntohs(_pktctx.tcp->source);
+    else
+        if(_pktctx.ip->protocol == IPPROTO_UDP)
+            return ntohs(_pktctx.udp->source);
+    return 0;
 }
 
 static u_int32_t PKCX_GetSequenceNumber(void) { 
-	if(_pktctx.ip->protocol == IPPROTO_TCP)
-		return ntohl(_pktctx.tcp->seq); 
-	return 0;
+    if(_pktctx.ip->protocol == IPPROTO_TCP)
+        return ntohl(_pktctx.tcp->seq); 
+    return 0;
 }
 
 #endif

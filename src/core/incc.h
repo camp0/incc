@@ -61,6 +61,8 @@ struct ST_InCCEngine {
 	int when_pcap_done_exit;
 	int sockrawfd; // socket for outbound messages;
 	short show_generated_payloads;
+	char *output_file_name;
+	FILE *output_file;
 
 	// Info related to the spoofed flow
 	uint32_t src_address;
@@ -92,6 +94,7 @@ void INCC_Destroy(void);
 void INCC_AddSignature(int identifier,char *name, char *expression,char *head,int hsize, char *tail,int tsize);
 void INCC_SetSource(char *source);
 void INCC_SetExitOnPcap(int value);
+void INCC_SetOutputFileName(char *file_name);
 
 void INCC_ShowGeneratedPayload(int value);
 void INCC_SetPacketTTL(int ttl);

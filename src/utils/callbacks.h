@@ -32,19 +32,19 @@
 #include <dbus/dbus.h>
 
 struct ST_Callback {
-        char *name;
-        char *in;
-        char *out;
-        void (*func)(DBusConnection *c,DBusMessage *msg, void *data);
+    char *name;
+    char *in;
+    char *out;
+    void (*func)(DBusConnection *c,DBusMessage *msg, void *data);
 };
 
 typedef struct ST_Callback ST_Callback;
 
 struct ST_Interface {
-        char *name;
-        ST_Callback *methods;
-        ST_Callback *signals;
-        ST_Callback *properties;
+    char *name;
+    ST_Callback *methods;
+    ST_Callback *signals;
+    ST_Callback *properties;
 };
 
 typedef struct ST_Interface ST_Interface;
