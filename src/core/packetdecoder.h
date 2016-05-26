@@ -42,14 +42,14 @@
 #define ETH_P_IP 0x0800
 
 struct ST_PacketDecoder {
-        int64_t _totalEthernetPackets;
-        int64_t _totalEthernetVlanPackets;
-        int64_t _totalIpPackets;
-        int64_t _totalIpv6Packets;
-        int64_t _totalTcpPackets;
-        int64_t _totalUdpPackets;
-        int64_t _totalUnknownPackets;
-	int64_t _totalL7Packets;
+    int64_t _totalEthernetPackets;
+    int64_t _totalEthernetVlanPackets;
+    int64_t _totalIpPackets;
+    int64_t _totalIpv6Packets;
+    int64_t _totalTcpPackets;
+    int64_t _totalUdpPackets;
+    int64_t _totalUnknownPackets;
+    int64_t _totalL7Packets;
 };
 
 typedef struct ST_PacketDecoder ST_PacketDecoder;

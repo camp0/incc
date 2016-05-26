@@ -34,11 +34,11 @@
  */
 
 ST_Protocol *PROT_Init() {
-	ST_Protocol *p = NULL;
+    ST_Protocol *p = NULL;
 
-	p = (ST_Protocol*)g_new(ST_Protocol,1);
-	p->rc4_encryption_key = "kaka";
-	return p;
+    p = (ST_Protocol*)g_new(ST_Protocol,1);
+    p->rc4_encryption_key = "kaka";
+    return p;
 }
 
 /**
@@ -48,8 +48,8 @@ ST_Protocol *PROT_Init() {
 
 void PROT_Stats(ST_Protocol *p){
 
-	fprintf(stdout,"Protocol statistics\n");
-	return;
+    fprintf(stdout,"Protocol statistics\n");
+    return;
 }
 
 /**
@@ -58,8 +58,8 @@ void PROT_Stats(ST_Protocol *p){
  * @param p the ST_Protocol to free
  */
 void PROT_Destroy(ST_Protocol *p){
-	g_free(p);
-	p = NULL;
+    g_free(p);
+    p = NULL;
 }
 
 /**
@@ -73,16 +73,16 @@ void PROT_Destroy(ST_Protocol *p){
  * @return ST_Payload
  */
 ST_Payload *PROT_GeneratePayload(ST_Protocol *proto,ST_Signature *sig,char *buffer,int len){
-	ST_Payload *payload = NULL;
+    ST_Payload *payload = NULL;
 
-	payload = PYLD_GeneratePayload(proto->rc4_encryption_key,
-		sig->head,
-		sig->headsize,
-		sig->tail,
-		sig->tailsize,
-		buffer,len);
+    payload = PYLD_GeneratePayload(proto->rc4_encryption_key,
+        sig->head,
+        sig->headsize,
+        sig->tail,
+        sig->tailsize,
+        buffer,len);
 
-	return payload;
+    return payload;
 }
 
 /**
@@ -94,14 +94,14 @@ ST_Payload *PROT_GeneratePayload(ST_Protocol *proto,ST_Signature *sig,char *buff
  * @return ST_Payload
  */
 ST_Payload *PROT_RecoverPayload(ST_Protocol *proto,ST_Payload *p,ST_Signature *sig){
-	ST_Payload *payload = NULL;
+    ST_Payload *payload = NULL;
 
-	payload = PYLD_RecoverPayload(proto->rc4_encryption_key,p,
-		sig->head,
-		sig->headsize,
-		sig->tail,
-		sig->tailsize);
+    payload = PYLD_RecoverPayload(proto->rc4_encryption_key,p,
+        sig->head,
+        sig->headsize,
+        sig->tail,
+        sig->tailsize);
 
-	return payload;
+    return payload;
 }
 
