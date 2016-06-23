@@ -74,9 +74,10 @@ static LOG4C_INLINE int POLG_Destroy(){
 
 static LOG4C_INLINE void POLG_Msg(char *catName,int a_priority, char *msg){
 #ifdef HAVE_LIBLOG4C 
-        log4c_category_log(log4c_category_get(catName), a_priority, msg);
+        log4c_category_log(log4c_category_get(catName), a_priority, "%s",msg);
+        // printf("%s\n",msg);
 #else
-        printf(msg);
+        printf("%s\n",msg);
 #endif
 }
 

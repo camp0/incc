@@ -15,7 +15,7 @@ $(srcdir)/incc_test_wrap.c: incc_test.i
 	$(SWIG) -python incc_test.i
 	$(PYTHON) setup.py build_ext --inplace -DHAVE_CONFIG_H
 
-EXTRA_DIST =    README testall.sh incc_test.i setup.py
+EXTRA_DIST =    README testall.sh incc_test.i setup.pp tests.py dummy.py message.py
 
 TESTS =		testall.sh
 

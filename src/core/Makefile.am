@@ -24,12 +24,6 @@ PYTHON_INCLUDES = -I/usr/include -I. -I.. -I../.. "`pkg-config --cflags glib-2.0
 
 python_PYTHON = daemon.py
 
-#bin_PROGRAMS = incc 
-
-#incc_SOURCES = main.c 
-#incc_LDFLAGS = $(DEPS_LIBS) -lincc -lpcap -lssl 
-#incc_LDADD = -lincc $(DEPS_LIBS) -lssl
-
 EXTRA_DIST = incc.i setup.py log4crc
 
 CLEANFILES = $(srcdir)/incc_wrap.c $(srcdir)/_incc.so *.pyc incc.py 
@@ -41,6 +35,5 @@ MAINTAINERCLEANFILES = \
 
 $(srcdir)/incc_wrap.c: incc.i
 	$(SWIG) -python incc.i
-#	$(PYTHON) setup.py build_ext --inplace 
 	$(PYTHON) setup.py build_ext --inplace -DHAVE_CONFIG_H
 

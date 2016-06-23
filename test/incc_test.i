@@ -4,6 +4,7 @@
 #include "flowpool.h"
 #include "genericflow.h"
 #include "payload.h"
+#include "incc.h"
 %}
 
 %apply unsigned int { uint32_t }
@@ -17,3 +18,4 @@
 %include "../src/core/flowpool.h"
 %include "../src/core/genericflow.h"
 %include "../src/core/payload.h"
+%include "../src/core/incc.h"

@@ -4,15 +4,17 @@
 <log4c version="1.2.1">
 
         <config>
-                <bufsize>0</bufsize>
+                <bufsize>1024</bufsize>
                 <debug level="0"/>
                 <nocleanup>0</nocleanup>
         </config>
 
         <!-- root category ========================================= -->
         <category name="root" priority="notice"/>
-        <!--<category name="incc.engine" priority="info" appender="stdout"/> -->
+        <category name="incc.engine" priority="info" appender="stdout"/> 
+        <category name="incc.engine" priority="debug" appender="stdout"/> 
         <category name="incc" priority="debug" appender="stdout"/>
+        <category name="incc" priority="info" appender="stdout"/>
         <category name="incc.bus" priority="info" appender="stdout"/>
 
         <!-- default appenders ===================================== -->

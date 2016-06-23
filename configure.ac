@@ -1,5 +1,5 @@
-AC_INIT([incc],[1.0],[luis.camp0.2009@gmail.com],[],[])
-AM_INIT_AUTOMAKE(incc,1.0)
+AC_INIT([incc],[1.1],[luis.camp0.2009@gmail.com],[],[])
+AM_INIT_AUTOMAKE(incc,1.1)
 AM_PROG_LIBTOOL
 
 AC_CONFIG_HEADER(config.h)
@@ -108,11 +108,29 @@ AC_SUBST(PCRE_LIB)
     fi
 
 
-
+PKG_CHECK_MODULES(
+	[OPENSSL],
+	[libcrypto >= 0.9.8],
+	,
+	[PKG_CHECK_MODULES(
+		[OPENSSL],
+		[openssl >= 0.9.8],
+		,
+		[AC_CHECK_LIB(
+			[crypto],
+			[RSA_verify],
+			[OPENSSL_LIBS="-lcrypto ${SOCKETS_LIBS} ${DL_LIBS}"],
+			[AC_MSG_ERROR([OpenSSL 0.9.8 or later is required. http://www.openssl.org/])],
+			[${DL_LIBS}]
+		)]
+	)]
+)
 
 PKG_CHECK_MODULES(GLIB,[glib-2.0 >= 2.10.3],[],AC_MSG_ERROR($GLIB_PKG_ERRORS))
 
 PKG_CHECK_MODULES(DBUS,dbus-1 )
+# AC_CHECK_HEADER(dbus.h, ,[AC_MSG_ERROR("dbus.h header not found.")],)
+# missing openssl for libssl for rc4
 
 AC_CHECK_DEBUG
 

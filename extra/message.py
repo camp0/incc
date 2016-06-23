@@ -11,26 +11,26 @@ import dbus
 	
 if __name__ == '__main__':
 	
-	bus = dbus.SessionBus()
-	try:
-		proxy = bus.get_object('incc.engine', '/incc/engine')
-	except:	
-		print "No InCC engine available on the bus"
-		sys.exit(-1)
+    bus = dbus.SessionBus()
+    try:
+	proxy = bus.get_object('incc.engine', '/incc/engine')
+    except:	
+	print "No InCC engine available on the bus"
+	sys.exit(-1)
 
-	iface = dbus.Interface(proxy,dbus_interface='incc.engine')
+    iface = dbus.Interface(proxy,dbus_interface='incc.engine')
 
-	while 1:
-    		try:
-			print "Enter message:"
-        		line = sys.stdin.readline()
-    		except KeyboardInterrupt:
-        		break
+    while 1:
+   	try:
+	    print "Enter message:"
+       	    line = sys.stdin.readline()
+    	except KeyboardInterrupt:
+            break
 
-    		if not line:
-        		break
+    	if not line:
+       	    break
 
-		print "Sending to InCC"
-		iface.SendMessage(line.rstrip())
+	print "Sending to InCC"
+	iface.SendMessage(line.rstrip())
 
-	sys.exit(0)	
+    sys.exit(0)	

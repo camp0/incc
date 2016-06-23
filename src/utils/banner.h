@@ -26,9 +26,13 @@
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
+#else
+#define PACKAGE "incc"
+#define PACKAGE_VERSION "1.1"
+#define PACKAGE_BUGREPORT "luis"
 #endif
 
-static char *version_banner =  
+static char *version_banner = \
 "GNU " PACKAGE " " PACKAGE_VERSION "\n"
 "Copyright 2013 Free Software Foundation, Inc.\n"
 "This program is free software; you may redistribute it under the terms of\n"
@@ -37,5 +41,11 @@ static char *version_banner =
 
 static char *bugs_banner = 
 "Report bugs to <" PACKAGE_BUGREPORT ">.\n";
+
+#ifdef __GNUC__
+#define VARIABLE_IS_NOT_USED __attribute__ ((unused))
+#else
+#define VARIABLE_IS_NOT_USED
+#endif
 
 #endif

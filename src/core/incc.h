@@ -77,9 +77,11 @@ struct ST_InCCEngine {
 	ST_Detection *detect;
 	ST_Protocol *protocol;
 	GString *source;
+	GString *interface_bus_name;
 	pcap_t *pcap;
 	// Statistics
 	int32_t send_messages;
+	int32_t try_send_messages;
 	int32_t receive_messages;
 	int32_t decrypt_messages;
 };
@@ -96,8 +98,10 @@ void INCC_SetExitOnPcap(int value);
 void INCC_ShowGeneratedPayload(int value);
 void INCC_SetPacketTTL(int ttl);
 void INCC_SetSourceIP(char *ipsrc);
+void INCC_SetSourceMask(char *ipsrc);
 void INCC_SetSourcePort(int srcport);
 void INCC_SetDestinationIP(char *ipdst);
+void INCC_SetDestinationMask(char *ipdst);
 void INCC_SetDestinationPort(int dstport);
 void INCC_SetEncryptionKey(char *key);
 

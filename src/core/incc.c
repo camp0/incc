@@ -21,7 +21,6 @@
  * Written by Luis Campo Giralte <luis.camp0.2009@gmail.com> 2013 
  *
  */
-
 #include "incc.h"
 #include "inccdbus.h"
 #include "callbacks.h"
@@ -30,6 +29,8 @@
 
 #define INCCLOG_CATEGORY_NAME INCC_INTERFACE
 #include "log.h"
+
+#define DEBUG 1
 
 static ST_InCCEngine *_inccEngine = NULL;
 
@@ -42,6 +43,7 @@ void INCC_Init() {
 	register int i,j;
 	ST_Callback *current = NULL;
 	ST_Interface *interface = NULL;
+	GString *interface_name = NULL;
 
 	_inccEngine = (ST_InCCEngine*)g_new0(ST_InCCEngine,1);
 
@@ -55,19 +57,29 @@ void INCC_Init() {
 	_inccEngine->ttl = 64;
 	_inccEngine->src_port = 0;
 	_inccEngine->src_address = -1;
-	_inccEngine->src_mask_address = 0;
+	_inccEngine->src_mask_address = 0xFFFFFFFF;
 	_inccEngine->dst_port = 0;
 	_inccEngine->dst_address = -1;
-	_inccEngine->dst_mask_address = 0; 
+	_inccEngine->dst_mask_address = 0xFFFFFFFF; 
         _inccEngine->send_messages = 0;
+        _inccEngine->try_send_messages = 0;
         _inccEngine->receive_messages = 0;
         _inccEngine->decrypt_messages = 0;
-	_inccEngine->sockrawfd = PCKT_InitToDevice("lo");
-	//_inccEngine->sockrawfd = PCKT_Init();
+	_inccEngine->sockrawfd = -1; 
 	_inccEngine->show_generated_payloads = FALSE;
-
 	_inccEngine->source = g_string_new("");
-	_inccEngine->bus = ICDS_Connect(INCC_INTERFACE,(void*)_inccEngine);
+	_inccEngine->interface_bus_name = NULL; 
+	interface_name = g_string_new("");
+
+	for (register int i = 0; i < 5 ; i++) {
+		g_string_printf(interface_name,"%s%i",INCC_INTERFACE,i);
+
+		_inccEngine->bus = ICDS_Connect(interface_name->str,(void*)_inccEngine);
+		if (_inccEngine->bus != NULL) {
+			_inccEngine->interface_bus_name = interface_name;
+			break;
+		}
+	}
 
 	/* Only load the callbacks if dbus is running */ 
 	if(_inccEngine->bus != NULL) {
@@ -110,10 +122,21 @@ void INCC_Init() {
 	_inccEngine->detect = DTTN_Init(); 
 	COMN_SetFlowPool(_inccEngine->conn,_inccEngine->flowpool);
 
-#ifdef DEBUG
+#ifdef HAVE_LIBLOG4C
 	LOG(INCCLOG_PRIORITY_DEBUG,"Initialized engine....");
+	if (_inccEngine->interface_bus_name == NULL) {
+		LOG(INCCLOG_PRIORITY_DEBUG,"Not connected to DBus");
+	} else {
+		LOG(INCCLOG_PRIORITY_DEBUG,"Connected as %s on DBus", _inccEngine->interface_bus_name->str);
+	}
 	LOG(INCCLOG_PRIORITY_DEBUG,"connection manager (0x%x)",_inccEngine->conn);
 	LOG(INCCLOG_PRIORITY_DEBUG,"flowpool (0x%x)",_inccEngine->flowpool);
+#else
+#ifdef DEBUG
+	fprintf(stdout,"Initialized engine....\n");
+	fprintf(stdout,"connection manager (0x%x)\n",_inccEngine->conn);
+	fprintf(stdout,"flowpool (0x%x)\n",_inccEngine->flowpool);
+#endif
 #endif
 	return;
 }
@@ -167,6 +190,13 @@ void INCC_Start() {
                 	_inccEngine->pcap = NULL;
                 	return;
         	}
+
+		/* if is a pcap file we will inject the packet on lo just for testing purposes */
+		if (_inccEngine->is_pcap_file == TRUE) {
+			_inccEngine->sockrawfd = PCKT_InitToDevice("lo");
+		} else {
+			_inccEngine->sockrawfd = PCKT_InitToDevice(_inccEngine->source->str);
+		}
 		_inccEngine->pcapfd = pcap_get_selectable_fd(_inccEngine->pcap);
 		_inccEngine->incc_status = INCC_STATE_RUNNING;
                 LOG(INCCLOG_PRIORITY_INFO,"Starting engine",NULL);
@@ -184,6 +214,7 @@ void INCC_Stop() {
 		// printf("pcap = 0x%x\n",_inccEngine->pcap);
 		//if(_inccEngine->pcap != NULL);
 		pcap_close(_inccEngine->pcap);
+		close(_inccEngine->sockrawfd);
 		_inccEngine->pcap = NULL;
 		_inccEngine->pcapfd = -1;
 		_inccEngine->incc_status = INCC_STATE_STOP;
@@ -212,6 +243,7 @@ void INCC_Destroy() {
 
 	close(_inccEngine->sockrawfd);
 	g_string_free(_inccEngine->source,TRUE);
+	g_string_free(_inccEngine->interface_bus_name,TRUE);
 	FLPO_Destroy(_inccEngine->flowpool);
 	COMN_Destroy(_inccEngine->conn);
 	DTTN_Destroy(_inccEngine->detect);
@@ -233,6 +265,7 @@ void INCC_Stats() {
         COMN_Stats(_inccEngine->conn);
 	DTTN_Stats(_inccEngine->detect);
 	fprintf(stdout,"Messages\n");
+	fprintf(stdout,"\tTry send: %d\n",_inccEngine->try_send_messages);
 	fprintf(stdout,"\tSend: %d\n",_inccEngine->send_messages);
 	fprintf(stdout,"\tDecrypted: %d\n",_inccEngine->decrypt_messages);
 	fprintf(stdout,"\tReceived: %d\n",_inccEngine->receive_messages);
@@ -257,8 +290,12 @@ void INCC_ProcessIncomingFlow(ST_Signature *sig,ST_GenericFlow *f,unsigned char 
 	uint32_t maskdst = _inccEngine->dst_mask_address;
 	uint32_t ipdst = PKCX_GetIPDstAddr();
 
-	if(((ipsrc & masksrc)==(_inccEngine->src_address & masksrc))&&
-		((ipdst & maskdst)==(_inccEngine->dst_address & maskdst))){
+	uint32_t net_lower_src = (ipsrc & masksrc);
+    	uint32_t net_upper_src = (net_lower_src | (~masksrc));
+	uint32_t net_lower_dst = (ipdst & maskdst);
+    	uint32_t net_upper_dst = (net_lower_dst | (~maskdst));
+
+	if ((ipsrc >= net_lower_src && ipsrc <= net_upper_src)&&(ipdst >= net_lower_dst && ipdst<= net_upper_dst)) {
 		// The flow in on the network configured
 		uint16_t srcport = PKCX_GetUDPSrcPort();	
 		uint16_t dstport = PKCX_GetUDPDstPort();	
@@ -273,7 +310,8 @@ void INCC_ProcessIncomingFlow(ST_Signature *sig,ST_GenericFlow *f,unsigned char 
 			_inccEngine->decrypt_messages ++;
 			pkt.payload = payload;
 			pkt.len = len;
-#ifdef DEBUG
+
+#ifdef HAVE_LIBLOG4C
 			LOG(INCCLOG_PRIORITY_DEBUG,
 				"Candidate packet from [%s:%d:%d:%s:%d] flow(0x%x) length(%d)",
 				PKCX_GetSrcAddrDotNotation(),
@@ -282,17 +320,49 @@ void INCC_ProcessIncomingFlow(ST_Signature *sig,ST_GenericFlow *f,unsigned char 
 				PKCX_GetDstAddrDotNotation(),
 				PKCX_GetDstPort(),
                        		f,len);
+#else
+			fprintf(stdout,"Candidate packet from [%s:%d:%d:%s:%d] flow(0x%x) length(%d)\n",
+                                PKCX_GetSrcAddrDotNotation(),
+                                PKCX_GetSrcPort(),
+                                17,
+                                PKCX_GetDstAddrDotNotation(),
+                                PKCX_GetDstPort(),
+                                f,len);
 #endif
 	
 			pkt_recover = PROT_RecoverPayload(_inccEngine->protocol,&pkt,sig);
 			if(pkt_recover) {
 				_inccEngine->receive_messages ++;
+#ifdef HAVE_LIBLOG4C
 				LOG(INCCLOG_PRIORITY_INFO,
-					"Message received and decrypted flow(0x%x)msg(%s)",f,pkt_recover->payload);
-
+					"Message recevied on flow [%s:%d:%d:%s:%d] flow(0x%x) Message(%s)",
+					PKCX_GetSrcAddrDotNotation(),
+					PKCX_GetSrcPort(),
+					17,
+					PKCX_GetDstAddrDotNotation(),
+					PKCX_GetDstPort(),
+					f,
+					pkt_recover->payload);
+#else
+				fprintf(stdout,"Message recevied on flow [%s:%d:%d:%s:%d] flow(0x%x) Message(%s)\n",
+					PKCX_GetSrcAddrDotNotation(),
+					PKCX_GetSrcPort(),
+					17,
+					PKCX_GetDstAddrDotNotation(),
+					PKCX_GetDstPort(),
+					f,
+					pkt_recover->payload);
+#endif
 			}			
-
 		}
+	} else {
+		printf("Candidate packet from [%s:%d:%d:%s:%d] do not matchs with addresses\n",
+				PKCX_GetSrcAddrDotNotation(),
+				PKCX_GetSrcPort(),
+				17,
+				PKCX_GetDstAddrDotNotation(),
+				PKCX_GetDstPort(),
+                       		f,len);
 	}
 	return;
 }
@@ -313,10 +383,39 @@ void INCC_Run() {
 	struct pcap_pkthdr *header;
 	unsigned char *pkt_data;
 	struct pollfd local_fds[MAX_WATCHES];
+        struct in_addr a;
+        char ip_src_str[INET_ADDRSTRLEN];
+        char ip_src_mask_str[INET_ADDRSTRLEN];
+        char ip_dst_str[INET_ADDRSTRLEN];
+        char ip_dst_mask_str[INET_ADDRSTRLEN];
 
-        fprintf(stdout,"%s running on %s machine %s\n",INCC_ENGINE_NAME,
+	// Verfiy the IP addresses of the engine
+        a.s_addr = _inccEngine->src_address;
+        if (inet_ntop(AF_INET, &a, ip_src_str, INET_ADDRSTRLEN) == NULL) {
+		fprintf(stderr,"Invalid ipsrc parameter\n");
+		exit(-1);
+	}
+        a.s_addr = _inccEngine->src_mask_address;
+        if (inet_ntop(AF_INET, &a, ip_src_mask_str, INET_ADDRSTRLEN) == NULL) {
+		fprintf(stderr,"Invalid ipsrc mask parameter\n");
+		exit(-1);
+	}
+        a.s_addr = _inccEngine->dst_address;
+        if (inet_ntop(AF_INET, &a, ip_dst_str, INET_ADDRSTRLEN) == NULL) {
+		fprintf(stderr,"Invalid ipdst parameter\n");
+		exit(-1);
+	}
+        a.s_addr = _inccEngine->dst_mask_address;
+        if (inet_ntop(AF_INET, &a, ip_dst_mask_str, INET_ADDRSTRLEN) == NULL) {
+		fprintf(stderr,"Invalid ipsdst mask parameter\n");
+		exit(-1);
+	}
+
+        fprintf(stdout,"%s running on  %s machine %s\n",INCC_ENGINE_NAME,
 		SYIN_GetOSName(),SYIN_GetMachineName());
         fprintf(stdout,"\tversion %s\n",SYIN_GetVersionName());
+        fprintf(stdout,"\tipsrc %s netmask %s\n",ip_src_str,ip_src_mask_str);
+        fprintf(stdout,"\tipdst %s netmask %s\n",ip_dst_str,ip_dst_mask_str);
 
         gettimeofday(&lasttimeouttime,NULL);
 	update_timers = 1;
@@ -522,42 +621,26 @@ void INCC_SetDestinationPort(int dstport){
 
 
 void INCC_SetSourceIP(char *ipsrc){
-	struct in_addr addr;
-	char *mask;
-	int ret;
 
-	mask = strchr(ipsrc,'/');
-	if(mask == NULL) {
-		mask = "0";
-	}else{
-    		*mask++ = '\0';
-	}
+	_inccEngine->src_address = inet_addr(ipsrc);
+	return;
+}
 
-	ret = inet_aton(ipsrc,&addr);
-	if(ret) {
-		_inccEngine->src_address = ntohl(addr.s_addr);
-		_inccEngine->src_mask_address  = ~0 << (32 - atoi(mask));
-	}
+void INCC_SetSourceMask(char *masksrc){
+
+	_inccEngine->src_mask_address = inet_addr(masksrc);
+	return;
+}
+
+void INCC_SetDestinationMask(char *maskdst){
+
+	_inccEngine->dst_mask_address = inet_addr(maskdst); 
 	return;
 }
 
 void INCC_SetDestinationIP(char *ipdst){
-        struct in_addr addr;
-        char *mask;
-        int ret;
 
-        mask = strchr(ipdst,'/');
-        if(mask == NULL) {
-                mask = "0";
-        }else{
-                *mask++ = '\0';
-        }
-
-        ret = inet_aton(ipdst,&addr);
-        if(ret) {
-                _inccEngine->dst_address = ntohl(addr.s_addr);
-                _inccEngine->dst_mask_address  = ~0 << (32 - atoi(mask));
-        }
+        _inccEngine->dst_address = inet_addr(ipdst);
 	return;
 }
 
@@ -577,6 +660,8 @@ void INCC_SendMessage(char *message){
 	struct in_addr a,b;
         char ipsrc_str[INET_ADDRSTRLEN];
         char ipdst_str[INET_ADDRSTRLEN];
+
+	_inccEngine->try_send_messages ++;
 
 	av = DTTN_GetAvailable(_inccEngine->detect);
 	if(av) {
@@ -630,6 +715,7 @@ void INCC_SendMessage(char *message){
 		if(_inccEngine->show_generated_payloads == TRUE){
 			PYLD_Printf(payload);
 		}
+		_inccEngine->send_messages ++;
 		PYLD_Destroy(payload);
 	}else{
         	LOG(INCCLOG_PRIORITY_INFO,

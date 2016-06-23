@@ -161,6 +161,7 @@ void PRCA_Method_SendMessage(DBusConnection *conn,DBusMessage *msg, void *data){
         else
                 dbus_message_iter_get_basic(&args, &param);
 
+        printf("PRCA_Method_SendMessage:%s\n",param);
         INCC_SendMessage(param);
 
         dbus_message_iter_init(reply, &args);

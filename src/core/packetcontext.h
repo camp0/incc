@@ -42,6 +42,12 @@
 #define ETH_P_8021Q 0x8100
 #define ETH_P_IP 0x0800
 
+#ifdef __GNUC__
+#define VARIABLE_IS_NOT_USED __attribute__ ((unused))
+#else
+#define VARIABLE_IS_NOT_USED
+#endif
+
 struct ST_PacketContext {
 	struct iphdr *ip;
 	struct tcphdr *tcp;
@@ -75,17 +81,17 @@ static int PKCX_IsIPver4(void) { return _pktctx.ip->version == 4; }
 static int PKCX_GetIPProtocol(void) { return _pktctx.ip->protocol; }
 /* TCP Fields */
 static struct tcphdr *PKCX_GetTCPHeader(void) { return _pktctx.tcp;}
-static unsigned int PKCX_GetTCPPayloadLength(void) { return ntohs(_pktctx.ip->tot_len) - _pktctx.ip->ihl * 4 - _pktctx.tcp->doff * 4; }
-static int PKCX_GetPayloadLength(void) { return _pktctx.len; }
-static unsigned int PKCX_GetTCPHeaderLength(void) { return _pktctx.tcp->doff * 4; }
-static u_int16_t PKCX_GetTCPSrcPort(void) { return ntohs(_pktctx.tcp->source); }
-static u_int16_t PKCX_GetTCPDstPort(void) { return ntohs(_pktctx.tcp->dest); }
-static int PKCX_IsTCPSyn(void) { return _pktctx.tcp->syn;}
-static int PKCX_IsTCPAck(void) { return _pktctx.tcp->ack;}
-static int PKCX_IsTCPRst(void) { return _pktctx.tcp->rst;}
-static int PKCX_IsTCPFin(void) { return _pktctx.tcp->fin;}
-static int PKCX_IsTCPPush(void) { return _pktctx.tcp->psh;}
-static unsigned char *PKCX_GetPayload(void) { return _pktctx.payload;}
+static unsigned int VARIABLE_IS_NOT_USED PKCX_GetTCPPayloadLength(void) { return ntohs(_pktctx.ip->tot_len) - _pktctx.ip->ihl * 4 - _pktctx.tcp->doff * 4; }
+static int VARIABLE_IS_NOT_USED PKCX_GetPayloadLength(void) { return _pktctx.len; }
+static unsigned int VARIABLE_IS_NOT_USED PKCX_GetTCPHeaderLength(void) { return _pktctx.tcp->doff * 4; }
+static u_int16_t VARIABLE_IS_NOT_USED PKCX_GetTCPSrcPort(void) { return ntohs(_pktctx.tcp->source); }
+static u_int16_t VARIABLE_IS_NOT_USED PKCX_GetTCPDstPort(void) { return ntohs(_pktctx.tcp->dest); }
+static int VARIABLE_IS_NOT_USED PKCX_IsTCPSyn(void) { return _pktctx.tcp->syn;}
+static int VARIABLE_IS_NOT_USED PKCX_IsTCPAck(void) { return _pktctx.tcp->ack;}
+static int VARIABLE_IS_NOT_USED PKCX_IsTCPRst(void) { return _pktctx.tcp->rst;}
+static int VARIABLE_IS_NOT_USED PKCX_IsTCPFin(void) { return _pktctx.tcp->fin;}
+static int VARIABLE_IS_NOT_USED PKCX_IsTCPPush(void) { return _pktctx.tcp->psh;}
+static unsigned char VARIABLE_IS_NOT_USED *PKCX_GetPayload(void) { return _pktctx.payload;}
 
 static char* PKCX_GetSrcAddrDotNotation(void) { 
 	struct in_addr a; 
@@ -102,16 +108,16 @@ static char* PKCX_GetDstAddrDotNotation(void) {
         inet_ntop(AF_INET, &a, ip, INET_ADDRSTRLEN);
         return (char*)&ip;
 }
-static u_int32_t PKCX_GetTCPSequenceNumber(void) { return ntohl(_pktctx.tcp->seq); }
+static u_int32_t VARIABLE_IS_NOT_USED PKCX_GetTCPSequenceNumber(void) { return ntohl(_pktctx.tcp->seq); }
 
 /* UDP Fields */
-static u_int16_t PKCX_GetUDPSrcPort(void) { return ntohs(_pktctx.udp->source);}
-static u_int16_t PKCX_GetUDPDstPort(void) { return ntohs(_pktctx.udp->dest);}
+static u_int16_t VARIABLE_IS_NOT_USED PKCX_GetUDPSrcPort(void) { return ntohs(_pktctx.udp->source);}
+static u_int16_t VARIABLE_IS_NOT_USED PKCX_GetUDPDstPort(void) { return ntohs(_pktctx.udp->dest);}
 static unsigned int PKCX_GetUDPPayloadLength(void) { return ntohs(_pktctx.udp->len) - sizeof(struct udphdr); }
 static unsigned int PKCX_GetUDPHeaderLength(void) { return sizeof(struct udphdr); }
 
 /* Generic fields */
-static u_int16_t PKCX_GetDstPort(void) { 
+static u_int16_t VARIABLE_IS_NOT_USED PKCX_GetDstPort(void) { 
 	if(_pktctx.ip->protocol == IPPROTO_TCP)
 		return ntohs(_pktctx.tcp->dest);
 	else
@@ -120,7 +126,7 @@ static u_int16_t PKCX_GetDstPort(void) {
 	return 0;
 }
 
-static u_int16_t PKCX_GetSrcPort(void) {
+static u_int16_t VARIABLE_IS_NOT_USED PKCX_GetSrcPort(void) {
         if(_pktctx.ip->protocol == IPPROTO_TCP)
                 return ntohs(_pktctx.tcp->source);
         else
@@ -129,7 +135,7 @@ static u_int16_t PKCX_GetSrcPort(void) {
         return 0;
 }
 
-static u_int32_t PKCX_GetSequenceNumber(void) { 
+static u_int32_t VARIABLE_IS_NOT_USED PKCX_GetSequenceNumber(void) { 
 	if(_pktctx.ip->protocol == IPPROTO_TCP)
 		return ntohl(_pktctx.tcp->seq); 
 	return 0;
